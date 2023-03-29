@@ -1,5 +1,6 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, Space, Typography } from 'antd';
+import md5 from 'md5';
 import { request } from '../utils/network';
 
 const LoginScreen = () => {
@@ -13,12 +14,13 @@ const LoginScreen = () => {
                     'POST',
                     {
                         user_name: values.username,
-                        password: values.password
+                        password: md5(values.password),
                     }
                 )
                 .then((res) => alert(res.code === 0 ? 'Success' : 'Failed'))
                 .catch((err) => alert('Error:' + err));
-            });
+            })
+            .catch((err) => {});
     };
 
     const { Title } = Typography;
