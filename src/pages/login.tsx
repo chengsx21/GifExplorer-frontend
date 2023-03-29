@@ -1,11 +1,13 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Layout, Space, Typography } from 'antd';
+import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
 import md5 from 'md5';
 import { request } from '../utils/network';
 
 const LoginScreen = () => {
+    // Hooks
     const [form] = Form.useForm();
 
+    // Callbacks
     const onLogin = () => {
         form.validateFields()
             .then((values) => {
@@ -17,12 +19,13 @@ const LoginScreen = () => {
                         password: md5(values.password),
                     }
                 )
-                .then((res) => alert(res.code === 0 ? 'Success' : 'Failed'))
-                .catch((err) => alert('Error:' + err));
+                    .then((res) => message.success('Login success'))
+                    .catch((err) => message.error('Login failed: ' + err));
             })
-            .catch((err) => {});
+            .catch ((err) => { });
     };
 
+    // Screen
     const { Title } = Typography;
 
     return (
