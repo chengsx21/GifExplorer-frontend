@@ -2,15 +2,11 @@ FROM node:18 AS build
 
 WORKDIR /opt/frontend
 
-RUN yarn config set registry https://registry.npmmirror.com
-
 COPY . .
 
-RUN yarn install
-
-RUN yarn run build
-
-RUN yarn run export
+RUN yarn install --registry https://registry.npmmirror.com && \
+    yarn run build && \
+    yarn run export
 
 FROM nginx:1.22
 
