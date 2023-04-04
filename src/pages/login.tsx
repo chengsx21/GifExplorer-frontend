@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
 import md5 from 'md5';
-import { request } from '../utils/network';
+import { userLogin } from '../utils/request';
 
 const LoginScreen = () => {
     // Hooks
@@ -11,18 +11,21 @@ const LoginScreen = () => {
     const onLogin = () => {
         form.validateFields()
             .then((values) => {
-                request(
-                    '/api/user/login',
-                    'POST',
-                    {
-                        user_name: values.username,
-                        password: md5(values.password),
-                    }
-                )
-                    .then((res) => message.success('Login success'))
-                    .catch((err) => message.error('Login failed: ' + err));
+                userLogin(values.username, md5(values.password))
+                    .then((res) => {
+                        res.token && localStorage.setItem("token", res.token);
+                        message.success("登录成功");
+                    })
+                    .catch((err) => {
+                        let reason = "登陆失败：";
+                        switch (err.response.code) {
+                            case 4: reason += "用户名或密码错误"; break;
+                            default: reason += "未知错误"; break;
+                        }
+                        message.error(reason);
+                    });
             })
-            .catch ((err) => { });
+            .catch((err) => {});
     };
 
     // Screen

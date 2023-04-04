@@ -21,23 +21,23 @@ service.interceptors.request.use(
 );
 
 // Error interface
-interface NetworkError {
+interface Error {
     code: number;
     info: string;
     data: any;
 }
 
 // Make general request
-export const request = async (
+export const request = async <T = any> (
     url: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     data?: any,
 ) => {
-    return await service.request({ method, url, data })
-        .then((response: AxiosResponse) => {
+    return service.request<T>({ method, url, data })
+        .then((response: AxiosResponse<T>) => {
             return response.data;
         })
-        .catch((error: AxiosError<NetworkError>) => {
+        .catch((error: AxiosError<Error>) => {
             return Promise.reject({
                 status: error.response?.status,
                 ...error.response?.data,
