@@ -20,8 +20,8 @@ service.interceptors.request.use(
     },
 );
 
-// Error interface
-interface Error {
+// Error information from backend
+interface ErrorInfo {
     code: number;
     info: string;
     data: any;
@@ -37,10 +37,10 @@ export const request = async <T = any> (
         .then((response: AxiosResponse<T>) => {
             return response.data;
         })
-        .catch((error: AxiosError<Error>) => {
+        .catch((error: AxiosError<ErrorInfo>) => {
             return Promise.reject({
-                status: error.response?.status,
-                ...error.response?.data,
+                status: error.response?.status || -1,
+                ...error.response?.data || {},
             });
         });
 };

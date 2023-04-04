@@ -1,7 +1,14 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
 import md5 from 'md5';
+import internal from 'stream';
 import { userLogin } from '../utils/request';
+
+// Map message code to message
+const messageMap = new Map<number, string>([
+    [-1, "未知错误"],
+    [4, "用户名或密码错误"],
+]);
 
 const LoginScreen = () => {
     // Hooks
@@ -17,12 +24,7 @@ const LoginScreen = () => {
                         message.success("登录成功");
                     })
                     .catch((err) => {
-                        let reason = "登陆失败：";
-                        switch (err.response.code) {
-                            case 4: reason += "用户名或密码错误"; break;
-                            default: reason += "未知错误"; break;
-                        }
-                        message.error(reason);
+                        message.error("登录失败：" + messageMap.get(err.code ?? -1));
                     });
             })
             .catch((err) => {});
