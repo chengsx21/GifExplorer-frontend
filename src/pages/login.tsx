@@ -1,7 +1,14 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
 import md5 from 'md5';
-import { request } from '../utils/network';
+import internal from 'stream';
+import { userLogin } from '../utils/request';
+
+// Map message code to message
+const messageMap = new Map<number, string>([
+    [-1, "未知错误"],
+    [4, "用户名或密码错误"],
+]);
 
 const LoginScreen = () => {
     // Hooks
@@ -11,18 +18,16 @@ const LoginScreen = () => {
     const onLogin = () => {
         form.validateFields()
             .then((values) => {
-                request(
-                    '/api/user/login',
-                    'POST',
-                    {
-                        user_name: values.username,
-                        password: md5(values.password),
-                    }
-                )
-                    .then((res) => message.success('Login success'))
-                    .catch((err) => message.error('Login failed: ' + err));
+                userLogin(values.username, md5(values.password))
+                    .then((res) => {
+                        res.token && localStorage.setItem("token", res.token);
+                        message.success("登录成功");
+                    })
+                    .catch((err) => {
+                        message.error("登录失败：" + messageMap.get(err.code ?? -1));
+                    });
             })
-            .catch ((err) => { });
+            .catch((err) => {});
     };
 
     // Screen

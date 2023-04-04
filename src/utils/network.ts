@@ -1,51 +1,46 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-const network = axios.create({
-    baseURL: "",
+// Create a new axios instance
+const service = axios.create({
+    baseURL: "/api/", // API base_url
+    timeout: 10000,   // Request timeout
 });
 
-enum NetworkErrorType {
-    CORRUPTED_RESPONSE,
-    UNKNOWN_ERROR,
+// Set request interceptor
+service.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            config.headers.Authorization = token;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    },
+);
+
+// Error information from backend
+interface ErrorInfo {
+    code: number;
+    info: string;
+    data: any;
 }
 
-export class NetworkError extends Error {
-    type: NetworkErrorType;
-    message: string;
-
-    constructor(
-        _type: NetworkErrorType,
-        _message: string,
-    ) {
-        super();
-
-        this.type = _type;
-        this.message = _message;
-    }
-
-    toString(): string { return this.message; }
-    valueOf(): Object { return this.message; }
-}
-
-export const request = async (
+// Make general request
+export const request = async <T = any> (
     url: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     data?: any,
 ) => {
-    const response = await network.request({ method, url, data })
-        .catch((err: AxiosError) => {
-            throw new NetworkError(
-                NetworkErrorType.UNKNOWN_ERROR,
-                `[${err.response?.status}] ` + (err.response?.data as any).info,
-            );
+    return service.request<T>({ method, url, data })
+        .then((response: AxiosResponse<T>) => {
+            return response.data;
+        })
+        .catch((error: AxiosError<ErrorInfo>) => {
+            return Promise.reject({
+                status: error.response?.status || -1,
+                ...error.response?.data || {},
+            });
         });
-
-    if (response?.data.code === 0) {
-        return { ...response.data, code: undefined };
-    } else {
-        throw new NetworkError(
-            NetworkErrorType.UNKNOWN_ERROR,
-            response?.data.info,
-        );
-    }
 };
