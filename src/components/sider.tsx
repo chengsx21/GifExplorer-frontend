@@ -1,45 +1,23 @@
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Sider } = Layout;
 
-const items: MenuProps['items'] = new Array(3).fill(null).map(
-    (_, index) => {
-        const key = String(index + 1);
-
-        return {
-            key: `sub${key}`,
-            label: `subnav ${key}`,
-
-            children: new Array(4).fill(null).map((_, j) => {
-                const subKey = index * 4 + j + 1;
-                return {
-                    key: subKey,
-                    label: `option${subKey}`,
-                };
-            }),
-        };
-    },
-);
+const items: MenuProps['items'] = ['1', '2', '3'].map((key) => ({
+    key,
+    label: `nav ${key}`,
+}));
 
 // Sider
 export const MainSider = () => {
     return (
-        <Sider width={200}>
+        <Sider className="main-sider" width={200}>
             <Menu
                 mode="inline"
-                defaultSelectedKeys={['1']}
+                theme="dark"
                 style={{ height: '100%', borderRight: 0 }}
-            > {
-                Array(3).fill(null).map((_, index) => {
-                    const key = String(index + 1);
-                    return (
-                        <Menu.Item key={key} label={key}>
-                            <span>nav {key}</span>
-                        </Menu.Item>
-                    );
-                })
-            } </Menu>
+                items={items}
+            />
         </Sider>
     );
 };

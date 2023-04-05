@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Input, Layout, Image, Button } from 'antd';
 import { MainHeader } from '../components/header';
 import { MainFooter } from '../components/footer';
+import { MainSider } from '../components/sider';
 
-const { Header, Footer, Sider, Content } = Layout;
+const { Content } = Layout;
 const { Search } = Input;
 
 // Search box of the index page, consider moving to folder "components" for reusing 
@@ -64,7 +65,10 @@ const IndexScreen = () => {
     return (
         <Layout className="layout">
             <MainHeader />
-            <IndexContent />
+            <Layout className="body">
+                <MainSider />
+                <IndexContent />
+            </Layout>
             <MainFooter />
         </Layout>
     );
