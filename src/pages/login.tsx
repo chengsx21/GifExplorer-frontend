@@ -4,19 +4,13 @@ import { useRouter } from 'next/router';
 import md5 from 'md5';
 import { userLogin } from '../utils/request';
 import { useLocalStorage } from '../utils/hooks';
-import { UserLocalInfo } from '../utils/types';
-
-// Map message code to message
-const messageMap = new Map<number, string>([
-    [-1, "未知错误"],
-    [4, "用户名或密码错误"],
-]);
+import { ApiError, UserLocalInfo } from '../utils/types';
 
 const LoginScreen: React.FC = () => {
     // Hooks
     const [form] = Form.useForm();
     const router = useRouter();
-    const [userInfo, setUserInfo] = useLocalStorage("userInfo", undefined as UserLocalInfo | undefined); // [token, setToken
+    const [userInfo, setUserInfo] = useLocalStorage("userInfo", undefined as UserLocalInfo | undefined);
 
     // Callbacks
     const onLogin = () => {
@@ -24,12 +18,12 @@ const LoginScreen: React.FC = () => {
             .then((values) => {
                 userLogin(values.username, md5(values.password))
                     .then((res) => {
-                        console.log(JSON.stringify(res));
                         setUserInfo(() => res);
                         message.success("登录成功");
+                        router.push("/");
                     })
-                    .catch((err) => {
-                        message.error("登录失败：" + messageMap.get(err.code ?? -1));
+                    .catch((err: ApiError) => {
+                        message.error("登录失败：" + err.localized_message);
                     });
             })
             .catch((err) => {});
