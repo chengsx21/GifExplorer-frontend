@@ -1,8 +1,10 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
+import { useRouter } from 'next/router';
 import md5 from 'md5';
-import internal from 'stream';
 import { userLogin } from '../utils/request';
+import { useLocalStorage } from '../utils/hooks';
+import { UserLocalInfo } from '../utils/types';
 
 // Map message code to message
 const messageMap = new Map<number, string>([
@@ -10,9 +12,11 @@ const messageMap = new Map<number, string>([
     [4, "用户名或密码错误"],
 ]);
 
-const LoginScreen = () => {
+const LoginScreen: React.FC = () => {
     // Hooks
     const [form] = Form.useForm();
+    const router = useRouter();
+    const [userInfo, setUserInfo] = useLocalStorage("userInfo", undefined as UserLocalInfo | undefined); // [token, setToken
 
     // Callbacks
     const onLogin = () => {
@@ -20,7 +24,8 @@ const LoginScreen = () => {
             .then((values) => {
                 userLogin(values.username, md5(values.password))
                     .then((res) => {
-                        res.token && localStorage.setItem("token", res.token);
+                        console.log(JSON.stringify(res));
+                        setUserInfo(() => res);
                         message.success("登录成功");
                     })
                     .catch((err) => {

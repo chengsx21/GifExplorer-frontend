@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 // Hook for using local storage
 // Ref: https://upmostly.com/next-js/using-localstorage-in-next-js
@@ -11,7 +11,11 @@ export function useLocalStorage<T>(key: string, fallbackValue: T) {
     }, [fallbackValue, key]);
 
     useEffect(() => {
-        localStorage.setItem(key, JSON.stringify(value));
+        if (value === undefined) { // If value is set to undefined, remove it from localStorage
+            localStorage.removeItem(key);
+        } else { // Or update the localStorage value
+            localStorage.setItem(key, JSON.stringify(value));
+        }
     }, [key, value]);
 
     return [value, setValue] as const;
