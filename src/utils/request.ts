@@ -1,23 +1,22 @@
 import { request } from './network';
-
-interface LoginResponse {
-    id: number;
-    user_name: string;
-    token: string;
-}
+import { UserLocalInfo } from './types';
 
 export const userRegister = (user_name: string, password: string) => {
-    return request<LoginResponse>("/user/register", "POST", {
+    return request<UserLocalInfo>("/user/register", "POST", {
         "user_name": user_name,
         "password": password,
     });
 };
 
 export const userLogin = (user_name: string, password: string) => {
-    return request<LoginResponse>("/user/login", "POST", {
+    const err_map = new Map<number, string>([
+        [4, "用户名或密码错误"],
+    ]);
+
+    return request<UserLocalInfo>("/user/login", "POST", {
         "user_name": user_name,
         "password": password,
-    });
+    }, err_map);
 };
 
 export const userModifyPassword = (user_name: string, old_password: string, new_password: string) => {

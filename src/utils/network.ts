@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { ApiResponse, ApiError } from "./types";
 
 // Create a new axios instance
 const service = axios.create({
@@ -20,27 +21,23 @@ service.interceptors.request.use(
     },
 );
 
-// Error information from backend
-interface ErrorInfo {
-    code: number;
-    info: string;
-    data: any;
-}
-
 // Make general request
 export const request = async <T = any> (
     url: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     data?: any,
+    err_map?: Map<number, string>,
 ) => {
-    return service.request<T>({ method, url, data })
-        .then((response: AxiosResponse<T>) => {
-            return response.data;
+    return service.request<ApiResponse<T>>({ method, url, data })
+        .then((response: AxiosResponse<ApiResponse<T>>) => {
+            return response.data.data;
         })
-        .catch((error: AxiosError<ErrorInfo>) => {
-            return Promise.reject({
-                status: error.response?.status || -1,
-                ...error.response?.data || {},
-            });
+        .catch((error: AxiosError<ApiResponse<{}>>) => {
+            const e: ApiError = {
+                status: error.response.status,
+                localized_message: err_map.get(error.response.data.code) || error.response.data.info,
+                ...error.response.data,
+            };
+            return Promise.reject(e);
         });
 };
