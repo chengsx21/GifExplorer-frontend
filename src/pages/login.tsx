@@ -1,6 +1,7 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import md5 from 'md5';
 import { userLogin } from '../utils/request';
 import { useLocalStorage } from '../utils/hooks';
@@ -65,15 +66,15 @@ const LoginScreen: React.FC = () => {
                     </Form.Item>
 
                     <a className="login-form-forgot" href="">
-                        Forgot password?
+                        忘记密码？
                     </a>
                 </Form.Item>
 
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="login-form-button" onClick={onLogin}>
-                        Log in
+                        登录
                     </Button>
-                    Or <a href="">Register now!</a>
+                    或 <Link href="/signup"> 现在注册！ </Link>
                 </Form.Item>
             </Form>
         </Layout>

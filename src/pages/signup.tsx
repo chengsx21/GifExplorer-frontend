@@ -1,29 +1,32 @@
-import { Button, Checkbox, Form, Input, Layout, message, Typography } from 'antd';
+import { Button, Form, Input, Layout, message, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { userRegister } from '../utils/request';
 import { useLocalStorage } from '../utils/hooks';
-import { UserLocalInfo } from '../utils/types';
+import { ApiError, UserLocalInfo } from '../utils/types';
 
 const SignupScreen: React.FC = () => {
     // Hooks
     const [form] = Form.useForm();
     const router = useRouter();
-    const [userInfo, setUserInfo] = useLocalStorage('userInfo', undefined as UserLocalInfo | undefined);
+    const [userInfo, setUserInfo] = useLocalStorage("userInfo", undefined as UserLocalInfo | undefined);
 
     // Callbacks
     const onSubmit = () => {
         form.validateFields().then((values) => {
             userRegister(values.username, values.password)
                 .then((res) => {
+                    console.log(res);
                     setUserInfo(() => res);
                     message.success("注册成功");
                     router.push("/");
                 })
-                .catch((err) => {
+                .catch((err: ApiError) => {
                     message.error("注册失败：" + err.localized_message);
                 });
             router.push('/');
+        }).catch((err) => {
+            message.error("注册失败：请检查输入");
         });
     };
 
@@ -44,13 +47,31 @@ const SignupScreen: React.FC = () => {
             >
                 <Form.Item
                     name="username"
-                    rules={[{ required: true, message: "请输入用户名！" }]}
+                    label="用户名"
+                    rules={[{ required: true, message: "请输入用户名" }]}
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    rules={[{ required: true, message: "请输入密码！" }]}
+                    label="密码"
+                    rules={[
+                        {
+                            required: true,
+                            message: "请输入密码",
+                        },
+                        {
+                            type: "string",
+                            min: 6,
+                            max: 20,
+                            message: "密码长度必须在6-20位之间",
+                        },
+                        {
+                            type: "string",
+                            pattern: new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/),
+                            message: "密码只能且必须包含大小写字母和数字",
+                        },
+                    ]}
                 >
                     <Input
                         prefix={<LockOutlined className="site-form-item-icon" />}
@@ -58,9 +79,33 @@ const SignupScreen: React.FC = () => {
                         placeholder="Password"
                     />
                 </Form.Item>
+                <Form.Item
+                    name="confirm"
+                    label="确认密码"
+                    rules={[
+                        {
+                            required: true,
+                            message: "请确认密码"
+                        },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error("两次输入的密码不一致"));
+                            },
+                        }),
+                    ]}
+                >
+                    <Input
+                        prefix={<LockOutlined className="site-form-item-icon" />}
+                        type="password"
+                        placeholder="Confirm password"
+                    />
+                </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit" className="login-form-button" onClick={onSubmit}>
-                        Submit
+                        提交
                     </Button>
                 </Form.Item>
             </Form>
