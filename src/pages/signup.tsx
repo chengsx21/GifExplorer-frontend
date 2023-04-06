@@ -1,12 +1,14 @@
-import { Button, Form, Input, Layout, message, Typography } from 'antd';
+import { Button, Form, Input, Layout, Space, message, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import md5 from 'md5';
 import { userRegister } from '../utils/request';
 import { useLocalStorage } from '../utils/hooks';
 import { ApiError, UserLocalInfo } from '../utils/types';
+import { MainHeader } from '../components/header';
+import { MainFooter } from '../components/footer';
 
-const SignupScreen: React.FC = () => {
+const SignupForm: React.FC = () => {
     // Hooks
     const [form] = Form.useForm();
     const router = useRouter();
@@ -29,6 +31,10 @@ const SignupScreen: React.FC = () => {
         });
     };
 
+    const onReset = () => {
+        form.resetFields();
+    };
+
     // Types
     const { Title } = Typography;
 
@@ -37,8 +43,8 @@ const SignupScreen: React.FC = () => {
         <Layout>
             <Title level={2}>Sign Up</Title>
             <Form
-                name="normal_signup"
-                className="signup-form"
+                name="user_signup"
+                className="site-signup-form"
                 form={form}
                 initialValues={{ remember: true }}
                 labelCol={{ span: 4 }}
@@ -103,11 +109,26 @@ const SignupScreen: React.FC = () => {
                     />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button" onClick={onSubmit}>
-                        提交
-                    </Button>
+                    <Space>
+                        <Button type="primary" htmlType="submit" className="site-form-button" onClick={onSubmit}>
+                            提交
+                        </Button>
+                        <Button type="default" htmlType="reset" className="site-form-button" onClick={onReset}>
+                            重置
+                        </Button>
+                    </Space>
                 </Form.Item>
             </Form>
+        </Layout>
+    );
+};
+
+const SignupScreen: React.FC = () => {
+    return (
+        <Layout className="site-layout">
+            <MainHeader />
+            <SignupForm />
+            <MainFooter />
         </Layout>
     );
 };
