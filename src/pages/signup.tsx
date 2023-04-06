@@ -1,6 +1,7 @@
 import { Button, Form, Input, Layout, message, Typography } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
+import md5 from 'md5';
 import { userRegister } from '../utils/request';
 import { useLocalStorage } from '../utils/hooks';
 import { ApiError, UserLocalInfo } from '../utils/types';
@@ -14,9 +15,8 @@ const SignupScreen: React.FC = () => {
     // Callbacks
     const onSubmit = () => {
         form.validateFields().then((values) => {
-            userRegister(values.username, values.password)
+            userRegister(values.username, md5(values.password))
                 .then((res) => {
-                    console.log(res);
                     setUserInfo(() => res);
                     message.success("注册成功");
                     router.push("/");
@@ -24,7 +24,6 @@ const SignupScreen: React.FC = () => {
                 .catch((err: ApiError) => {
                     message.error("注册失败：" + err.localized_message);
                 });
-            router.push('/');
         }).catch((err) => {
             message.error("注册失败：请检查输入");
         });
