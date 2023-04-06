@@ -9,14 +9,10 @@ export const userRegister = (user_name: string, password: string) => {
 };
 
 export const userLogin = (user_name: string, password: string) => {
-    const err_map = new Map<number, string>([
-        [4, "用户名或密码错误"],
-    ]);
-
     return request<UserLocalInfo>("/user/login", "POST", {
         "user_name": user_name,
         "password": password,
-    }, err_map);
+    });
 };
 
 export const userModifyPassword = (user_name: string, old_password: string, new_password: string) => {

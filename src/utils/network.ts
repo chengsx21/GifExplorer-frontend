@@ -21,12 +21,18 @@ service.interceptors.request.use(
     },
 );
 
+const errorMessageMap = new Map<number, string>([
+    [1, "用户名已存在"],
+    [2, "用户名不合法"],
+    [3, "密码格式不合法"],
+    [4, "用户名或密码错误"],
+]);
+
 // Make general request
 export const request = async <T = any> (
     url: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     data?: any,
-    err_map?: Map<number, string>,
 ) => {
     return service.request<ApiResponse<T>>({ method, url, data })
         .then((response: AxiosResponse<ApiResponse<T>>) => {
@@ -35,7 +41,7 @@ export const request = async <T = any> (
         .catch((error: AxiosError<ApiResponse<{}>>) => {
             const e: ApiError = {
                 status: error.response.status,
-                localized_message: err_map.get(error.response.data.code) || error.response.data.info,
+                localized_message: errorMessageMap.get(error.response.data.code) || error.response.data.info,
                 ...error.response.data,
             };
             return Promise.reject(e);
