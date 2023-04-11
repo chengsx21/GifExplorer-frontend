@@ -11,7 +11,6 @@ const service = axios.create({
 service.interceptors.request.use(
     (config) => {
         const token = JSON.parse(localStorage.getItem("userInfo"))?.token;
-        console.log(token);
         if (token !== undefined) {
             config.headers.Authorization = token;
         }
@@ -23,6 +22,7 @@ service.interceptors.request.use(
 );
 
 const errorMessageMap = new Map<number, string>([
+    [-1, "未知错误"],
     [0, "成功"],
     [1, "用户名已存在"],
     [2, "用户名不合法"],
@@ -47,6 +47,12 @@ export const request = async <T = any> (
             return response.data.data;
         })
         .catch((error: AxiosError<ApiResponse<{}>>) => {
+            if (error.code === "ECONNABORTED") {
+                return Promise.reject({
+                    status: 408,
+                    localized_message: "请求超时",
+                });
+            }
             const e: ApiError = {
                 status: error.response.status,
                 localized_message: errorMessageMap.get(error.response.data.code) || error.response.data.info,

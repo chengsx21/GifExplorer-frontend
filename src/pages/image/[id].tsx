@@ -1,4 +1,4 @@
-import { Button, Col, Card, Descriptions, Image, Layout, Row, message, Skeleton, Space, Spin } from "antd";
+import { Button, Col, Card, Descriptions, Empty, Image, Layout, Row, message, Skeleton, Space } from "antd";
 import { DownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
@@ -17,18 +17,21 @@ interface ImageDetailProps {
 const ImageMetadataCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
     return (
         <Card title="图片详情" loading={props.loading}>
-            <Descriptions column={1}>
-                <Descriptions.Item label="上传者">{props.data?.uploader}</Descriptions.Item>
-                <Descriptions.Item label="分辨率">{props.data?.width} x {props.data?.height}</Descriptions.Item>
-                <Descriptions.Item label="时长">{props.data?.duration} s</Descriptions.Item>
-                <Descriptions.Item label="发布时间">{new Date(props.data?.pub_time).toLocaleString()}</Descriptions.Item>
-            </Descriptions>
+            {props.data ? (
+                <Descriptions column={1}>
+                    <Descriptions.Item label="上传者">{props.data.uploader}</Descriptions.Item>
+                    <Descriptions.Item label="分辨率">{props.data.width} x {props.data?.height}</Descriptions.Item>
+                    <Descriptions.Item label="时长">{props.data.duration} s</Descriptions.Item>
+                    <Descriptions.Item label="发布时间">{new Date(props.data.pub_time).toLocaleString()}</Descriptions.Item>
+                </Descriptions>
+            ) : (
+                <Empty description="暂无数据"/>
+            )}
         </Card>
     );
 };
 
 const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
-    console.log(props?.data);
     return (
         <Card
             title={
