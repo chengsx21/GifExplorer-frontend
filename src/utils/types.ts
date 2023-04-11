@@ -18,9 +18,10 @@ export interface UserLocalInfo {
 export interface ImageMetadata {
     id: number;
     title: string;
-    gif_url: string;
     uploader: string;
+    width: number;
+    height: number;
+    duration: number;
     pub_time: string;
     like: number;
-    is_favorite: boolean;
 }

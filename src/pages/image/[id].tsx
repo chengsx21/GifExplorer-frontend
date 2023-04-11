@@ -1,41 +1,44 @@
-import { Button, Col, Card, Descriptions, Image, Layout, Row, message, Skeleton, Space } from "antd";
+import { Button, Col, Card, Descriptions, Image, Layout, Row, message, Skeleton, Space, Spin } from "antd";
 import { DownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchImageMetadata } from "../../utils/request";
 import { MainFooter } from "../../components/footer";
 import { MainHeader } from "../../components/header";
+import { Likes } from "../../components/likes";
 import { ApiError, ImageMetadata } from "../../utils/types";
 
 interface ImageDetailProps {
     loading: boolean;
     id: number;
-    title?: string;
-    uploader?: string;
-    createAt?: string;
+    data?: ImageMetadata;
 }
 
 const ImageMetadataCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
     return (
         <Card title="图片详情" loading={props.loading}>
             <Descriptions column={1}>
-                <Descriptions.Item label="上传者">{props?.uploader}</Descriptions.Item>
-                <Descriptions.Item label="发布时间">{props?.createAt}</Descriptions.Item>
+                <Descriptions.Item label="上传者">{props.data?.uploader}</Descriptions.Item>
+                <Descriptions.Item label="分辨率">{props.data?.width} x {props.data?.height}</Descriptions.Item>
+                <Descriptions.Item label="时长">{props.data?.duration} s</Descriptions.Item>
+                <Descriptions.Item label="发布时间">{new Date(props.data?.pub_time).toLocaleString()}</Descriptions.Item>
             </Descriptions>
         </Card>
     );
 };
 
 const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
+    console.log(props?.data);
     return (
         <Card
             title={
                 <Skeleton active loading={props.loading} title={{ width: "50%" }} paragraph={false}>
-                    {props.title}
+                    {props.data?.title}
                 </Skeleton>
             }
             extra={
                 <Space align="center">
+                    <Likes likes={props.data?.like} style={{ paddingRight: "16px" }}/>
                     <Button
                         type="primary"
                         icon={<DownloadOutlined />}
@@ -49,15 +52,16 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
                     </Button>
                 </Space>
             }
-            style={{ width: "100%", height: "100%" }}
+            bodyStyle={{ minHeight: "250px" }}
+            style={{ width: "100%", height: "100%"}}
         >
             <Image
                 src={`/api/image/preview/${props.id}`}
-                alt={props.loading ? "GIF picture" : props.title}
+                alt={props.loading ? "GIF picture" : props.data?.title}
                 height="100%"
                 width="100%"
                 placeholder={
-                    <Skeleton.Image active style={{ width: "100%", height: "100%" }}/>
+                    <Skeleton.Image active rootClassName="skeletonImgRoot" style={{width: "100%", height: "200px"}} />
                 }
                 onError={() => message.error("图片加载失败")}
             />
@@ -92,22 +96,22 @@ const ImageDetailScreen: React.FC = () => {
     const { Content } = Layout;
 
     return (
-        <Layout>
+        <Layout style={{ minHeight: "100vh" }}>
             <MainHeader />
-            <Content style={{ margin: "16px", height: "100vh"}}>
+            <Content style={{ margin: "16px"}}>
                 <Row align="top" gutter={16} style={{ height: "100%" }}>
                     <Col span={16} style={{ height: "100%" }}>
                         <ImageContentCard
                             loading={loading}
-                            id={imageMetadata?.id}
-                            title={imageMetadata?.title}
+                            id={query.id as unknown as number}
+                            data={imageMetadata}
                         />
                     </Col>
                     <Col span={8}>
                         <ImageMetadataCard
                             loading={loading}
-                            createAt={new Date(imageMetadata?.pub_time).toLocaleString()}
-                            {...imageMetadata}
+                            id={query.id as unknown as number}
+                            data={imageMetadata}
                         />
                     </Col>
                 </Row>
