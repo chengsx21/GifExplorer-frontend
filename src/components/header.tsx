@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, Layout, Menu, MenuProps, Row, Typography } from 'antd';
+import { Avatar, Button, Col, Layout, Menu, MenuProps, Row, Space, Tooltip } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useLocalStorage } from '../utils/hooks';
@@ -18,7 +18,6 @@ const items: MenuProps['items'] = ['1', '2', '3'].map((key) => ({
 }));
 
 const { Header } = Layout;
-const { Title } = Typography;
 
 // Header of the index page, with a linker to page "/login"   
 export const MainHeader: React.FC = () => {
@@ -32,27 +31,40 @@ export const MainHeader: React.FC = () => {
         <Header className="header" style={headerStyle}>
             <Row justify="center" align="middle" style={{ height: "100%" }}>
                 <Col span={4} style={{ height: "100%" }}>
-                    <div className="logo" style={{ float: "left" }} />
-                    <Title level={1} style={{ textAlign: "center", color: "white", fontSize: "2em" }}>
-                        GIF Explorer
-                    </Title>
-                </Col>
-                <Col span={20} style={{ height: "100%" }}>
-                    <div style={{ float: "right" }}>
-                        <Button type="link" onClick={() => { router.push("/login") }}>
-                            {userInfo === undefined ? (
-                                <UserOutlined style={{ fontSize: '1.5rem', color: "white" }} />
-                            ) : (
-                                <Avatar> {userInfo.user_name[0]} </Avatar>
-                            )}
+                    <Space align="center">
+                        <div className="logo" style={{ float: "left" }} />
+                        <Button type="text" onClick={() => router.push("/")}>
+                            <h1 style={{ margin: 0, color: "white" }}>
+                                GIF Explorer
+                            </h1>
                         </Button>
-                    </div>
-                    <div>
-                        <Menu
-                            theme="dark"
-                            mode="horizontal"
-                            items={items}
-                        />
+                    </Space>
+                </Col>
+                <Col span={16} style={{ height: "100%" }}>
+                    <Menu
+                        theme="dark"
+                        mode="horizontal"
+                        items={items}
+                    />
+                </Col>
+                <Col span={4} style={{ height: "100%" }}>
+                    <div style={{ float: "right" }}>
+                        {!userInfo ? (
+                            <Button type="link" onClick={() => router.push("/login")}>
+                                <UserOutlined style={{ fontSize: '1.5rem', color: "white" }} />
+                            </Button>
+                        ) : (
+                            <Button type="text" onClick={() => router.push(`/user/${userInfo.id}`)}>
+                                <Space align="center">
+                                    <Avatar style={{ backgroundColor: "grey" }}>
+                                        {userInfo.user_name[0]}
+                                    </Avatar>
+                                    <span style={{ color: "white" }}>
+                                        {userInfo.user_name}
+                                    </span>
+                                </Space>
+                            </Button>
+                        )}
                     </div>
                 </Col>
             </Row>
