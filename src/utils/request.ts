@@ -1,5 +1,5 @@
 import { request } from './network';
-import { UserLocalInfo } from './types';
+import { UserLocalInfo, ImageMetadata } from './types';
 
 export const userRegister = (user_name: string, password: string) => {
     return request<UserLocalInfo>("/user/register", "POST", {
@@ -29,4 +29,8 @@ export const userLogout = () => {
 
 export const userCheckLogin = () => {
     return request<{}>("/user/checklogin", "POST");
+}
+
+export const fetchImageMetadata = (id: number) => {
+    return request<{ImageMetadata}>(`/image/detail/${id}`, "GET");
 }

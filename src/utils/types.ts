@@ -14,3 +14,13 @@ export interface UserLocalInfo {
     user_name: string;
     token: string;
 }
+
+export interface ImageMetadata {
+    id: number;
+    title: string;
+    gif_url: string;
+    uploader: string;
+    pub_time: string;
+    like: number;
+    is_favorite: boolean;
+}
