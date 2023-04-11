@@ -32,5 +32,5 @@ export const userCheckLogin = () => {
 }
 
 export const fetchImageMetadata = (id: number) => {
-    return request<{ImageMetadata}>(`/image/detail/${id}`, "GET");
+    return request<ImageMetadata>(`/image/detail/${id}`, "GET");
 }
