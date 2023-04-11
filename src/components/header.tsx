@@ -1,5 +1,5 @@
 import { Avatar, Button, Col, Layout, Menu, MenuProps, Row, Space, Tooltip } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { FileImageTwoTone, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { useLocalStorage } from '../utils/hooks';
 import { UserLocalInfo } from '../utils/types';
@@ -9,6 +9,7 @@ const headerStyle: React.CSSProperties = {
     height: "64px",
     // position: "fixed",
     zIndex: 1,
+    paddingLeft: 40,
     // backgroundColor: "#6495ED",
 };
 
@@ -27,19 +28,19 @@ export const MainHeader: React.FC = () => {
 
     // Header
     return (
-        // Create another header with title and nav bar
         <Header className="header" style={headerStyle}>
-            <Row justify="center" align="middle" style={{ height: "100%" }}>
+            <Row align="middle" style={{ height: "100%" }}>
+                {/* Logo */}
                 <Col span={4} style={{ height: "100%" }}>
-                    <Space align="center">
-                        <div className="logo" style={{ float: "left" }} />
+                        <FileImageTwoTone style={{ fontSize: 20 }}/>
                         <Button type="text" onClick={() => router.push("/")}>
-                            <h1 style={{ margin: 0, color: "white" }}>
+                            <h1 style={{ verticalAlign: "middle", margin: 0, color: "white" }}>
                                 GIF Explorer
                             </h1>
                         </Button>
-                    </Space>
                 </Col>
+                
+                {/* Nav */}
                 <Col span={16} style={{ height: "100%" }}>
                     <Menu
                         theme="dark"
@@ -47,6 +48,8 @@ export const MainHeader: React.FC = () => {
                         items={items}
                     />
                 </Col>
+
+                {/* User */}
                 <Col span={4} style={{ height: "100%" }}>
                     <div style={{ float: "right" }}>
                         {!userInfo ? (
@@ -55,7 +58,7 @@ export const MainHeader: React.FC = () => {
                             </Button>
                         ) : (
                             <Button type="text" onClick={() => router.push(`/user/${userInfo.id}`)}>
-                                <Space align="center">
+                                <Space align="baseline">
                                     <Avatar style={{ backgroundColor: "grey" }}>
                                         {userInfo.user_name[0]}
                                     </Avatar>
