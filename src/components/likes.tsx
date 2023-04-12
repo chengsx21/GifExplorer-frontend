@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 interface LikesProps {
     likes: number;
+    disabled?: boolean; 
     style?: React.CSSProperties;
 }
 
@@ -19,13 +20,13 @@ export const Likes: React.FC<LikesProps> = (props: LikesProps) => {
             {liked ? (
                 <HeartFilled
                     style={{ color: "#f5222d", fontSize: 16 }}
-                    onClick={onClick}
+                    onClick={props.disabled ? undefined : onClick}
                 />
             ) : (
                 <HeartTwoTone
                     twoToneColor="#eb2f96"
                     style={{ fontSize: 16 }}
-                    onClick={onClick}
+                    onClick={props.disabled ? undefined : onClick}
                 />
             )}
             <span style={{ fontSize: 16 }}>{props.likes !== undefined && (props.likes + Number(liked))}</span>

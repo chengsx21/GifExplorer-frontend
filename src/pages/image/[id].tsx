@@ -32,7 +32,7 @@ const ImageMetadataCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) 
 };
 
 const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
-    const enabled = isMetadataLoaded(props.loading, props.data);
+    const disabled = !isMetadataLoaded(props.loading, props.data);
 
     return (
         <Card
@@ -43,19 +43,23 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
             }
             extra={
                 <Space align="center">
-                    <Likes likes={props.data?.like} style={{ paddingRight: "16px" }}/>
+                    <Likes
+                        likes={props.data?.like}
+                        disabled={disabled}
+                        style={{ paddingRight: "16px" }}
+                    />
                     <Button
                         type="primary"
                         icon={<DownloadOutlined />}
                         href={`/api/image/download/${props.id}`}
-                        disabled={!enabled}
+                        disabled={disabled}
                     >
                         下载
                     </Button>
                     <Button
                         type="default"
                         icon={<ShareAltOutlined />}
-                        disabled={!enabled}
+                        disabled={disabled}
                     >
                         分享
                     </Button>
@@ -66,7 +70,7 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
         >
             <Image
                 src={isValidUnsigned(props.id) ? `/api/image/preview/${props.id}` : ""}
-                alt={enabled ? props.data.title : "GIF Picture"}
+                alt={disabled ? "GIF Picture" : props.data?.title}
                 height="100%"
                 width="100%"
                 placeholder={
