@@ -1,7 +1,7 @@
 import { Button, Col, Card, Descriptions, Empty, Image, Layout, Row, message, Skeleton, Space } from "antd";
 import { DownloadOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import { fetchImageMetadata } from "../../utils/request";
 import { MainFooter } from "../../components/footer";
 import { MainHeader } from "../../components/header";
@@ -9,9 +9,9 @@ import { Likes } from "../../components/likes";
 import { ApiError, ImageMetadata } from "../../utils/types";
 
 interface ImageDetailProps {
-    loading: boolean;
-    id: number;
-    data?: ImageMetadata;
+    loading: boolean; // Metadata loading state
+    id: number | undefined; // Image ID
+    data?: ImageMetadata; // Image metadata
 }
 
 const ImageMetadataCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
@@ -32,6 +32,8 @@ const ImageMetadataCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) 
 };
 
 const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) => {
+    const disabled = !isMetadataLoaded(props.loading, props.data);
+
     return (
         <Card
             title={
@@ -41,16 +43,24 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
             }
             extra={
                 <Space align="center">
-                    <Likes likes={props.data?.like} style={{ paddingRight: "16px" }}/>
+                    <Likes
+                        likes={props.data?.like}
+                        disabled={disabled}
+                        style={{ paddingRight: "16px" }}
+                    />
                     <Button
                         type="primary"
                         icon={<DownloadOutlined />}
-                        href={`/api/image/download/${props?.id}`}
-                        disabled={props.loading}
+                        href={`/api/image/download/${props.id}`}
+                        disabled={disabled}
                     >
                         下载
                     </Button>
-                    <Button type="default" icon={<ShareAltOutlined />}>
+                    <Button
+                        type="default"
+                        icon={<ShareAltOutlined />}
+                        disabled={disabled}
+                    >
                         分享
                     </Button>
                 </Space>
@@ -59,8 +69,8 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
             style={{ width: "100%", height: "100%"}}
         >
             <Image
-                src={`/api/image/preview/${props.id}`}
-                alt={props.loading ? "GIF picture" : props.data?.title}
+                src={isValidUnsigned(props.id) ? `/api/image/preview/${props.id}` : ""}
+                alt={disabled ? "GIF Picture" : props.data?.title}
                 height="100%"
                 width="100%"
                 placeholder={
@@ -72,6 +82,13 @@ const ImageContentCard: React.FC<ImageDetailProps> = (props: ImageDetailProps) =
     );
 };
 
+const isValidUnsigned = (id: number) => {
+    return !isNaN(id) && id > 0;
+};
+
+const isMetadataLoaded = (loading: boolean, data?: ImageMetadata) => {
+    return data && loading === false;
+};
 
 const ImageDetailScreen: React.FC = () => {   
     const [loading, setLoading] = useState<boolean>(true);
@@ -81,11 +98,11 @@ const ImageDetailScreen: React.FC = () => {
     const query = router.query;
 
     useEffect(() => {
-        if (query.id === undefined) {
+        if (!router.isReady) {
             return;
         }
         setLoading(true);
-        fetchImageMetadata(query.id as unknown as number)
+        fetchImageMetadata(Number(query.id))
             .then((data) => {
                 setImageMetadata((_) => data);
                 setLoading(false);
@@ -106,14 +123,14 @@ const ImageDetailScreen: React.FC = () => {
                     <Col span={16} style={{ height: "100%" }}>
                         <ImageContentCard
                             loading={loading}
-                            id={query.id as unknown as number}
+                            id={Number(query.id)}
                             data={imageMetadata}
                         />
                     </Col>
                     <Col span={8}>
                         <ImageMetadataCard
                             loading={loading}
-                            id={query.id as unknown as number}
+                            id={Number(query.id)}
                             data={imageMetadata}
                         />
                     </Col>
